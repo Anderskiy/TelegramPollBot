@@ -7,7 +7,7 @@ from aiogram import Bot, Dispatcher
 from handler import basic
 
 load_dotenv()
-bot = Bot(token=(os.getenv('TOKEN')))
+bot = Bot(token=(os.getenv('TOKEN')), parse_mode='MarkdownV2')
 dp = Dispatcher()
 dp.include_router(basic.rt)
 
