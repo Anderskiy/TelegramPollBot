@@ -11,8 +11,8 @@ def paginator(page: int = 0):
     builder = InlineKeyboardBuilder()
     if page > 0:
         builder.add(InlineKeyboardButton(text="<-", callback_data=Pagination(action="prev", page=page).pack()))
-    if page < len(data['слайды']) - 1:
+    if page < len(data['слайди']) - 1:
         builder.add(InlineKeyboardButton(text="->", callback_data=Pagination(action="next", page=page).pack()))
-    if page == len(data['слайды']) - 1:
+    if page == len(data['слайди']) - 1:
         builder.add(InlineKeyboardButton(text="✕", callback_data=Pagination(action="close", page=page).pack()))
     return builder.as_markup()
