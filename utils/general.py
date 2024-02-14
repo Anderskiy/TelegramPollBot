@@ -14,8 +14,12 @@ poll_timers = {}
 sent_polls = {}
 
 
-with open('form.json', 'r', encoding='utf-8') as f:
-    data = json.load(f)
+try:
+    with open('form.json', 'r', encoding='utf-8') as f:
+        data = json.load(f)
+except Exception as e:
+    print("Помилка при запуску бота. Щось у файлі form.json вказано неправильно.")
+    exit()
 
 class CommandError(Exception):
     def __init__(self, message=None, *args):
@@ -113,7 +117,9 @@ class AioMember(AbstractSQLObject):
     async def set_new_result(cls, res, user_id):
         await abstract_sql('UPDATE users SET result=%s WHERE user_id=%s', f"{res}/{cls.total}", user_id, fetch=True)
 
+
 loop = asyncio.get_event_loop()
+
 
 def update_cache():
     global profiles_cache

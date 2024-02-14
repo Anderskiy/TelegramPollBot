@@ -52,30 +52,6 @@ async def abstract_sql(*args, **kwargs):
         return await _abstract_sql(*args, **kwargs)
 
 
-async def abstract_fetch(fetch_all, table, keys=None, keys_values=None, fields=None,
-                         raw_keys='', order_by=None, order_desc=False, limit=None, schema=None, matches_all=True):
-    if keys_values is None:
-        keys_values = []
-    fields = f'{", ".join(fields)}' if fields else '*'
-    delim = ' AND ' if matches_all else ' OR '
-    keys = ' WHERE ' + delim.join([f'`{key}`=%s' for key in keys]) if keys else ''
-    if not keys and raw_keys:
-        keys = ' WHERE ' + raw_keys
-    elif raw_keys:
-        keys = keys + delim + raw_keys
-    table = f'`{table}`' if not schema else f'`{schema}`.`{table}`'
-    if order_by:
-        order = f' ORDER BY {order_by}' + ' DESC' if order_desc else f' ORDER BY {order_by}'
-    else:
-        order = ''
-    if limit:
-        limit = f' LIMIT {limit}'
-    else:
-        limit = ''
-    statement = (f"SELECT {fields} FROM {table}{keys}{order}{limit}", *keys_values)
-    return await abstract_sql(*statement, fetch=True, fetchall=fetch_all)
-
-
 class MetaASO(type):
     _table = None
     _key_column = None
@@ -150,21 +126,6 @@ class AbstractSQLObject(metaclass=MetaASO):
             *[getattr(self, type(self).key_column)] + list(values) * 2)
         return True
 
-    async def force_update(self)->bool:
-        new = self.get_changed()
-        if not new:
-            return False
-        print(new)
-        changed, values = new
-        changes = ', '.join(changed)
-        filler = ', '.join(['%s'] * len(changed))
-        updates = ', '.join(
-            [f'`{change}`=`{change}`+%s' if change in self.incremental else f'`{change}`=%s' for change in changed])
-        await abstract_sql(
-            f'UPDATE `{type(self).table}` SET {updates} WHERE {type(self).key_column} = %s',
-            *list(values) + [getattr(self, type(self).key_column)])
-        return True
-
     @classmethod
     async def create_default(cls: Type[A], user_id, username) -> A:
         await abstract_sql(
@@ -181,34 +142,6 @@ class AbstractSQLObject(metaclass=MetaASO):
             return None
         aya = cls(data)
         return aya
-
-    @classmethod
-    async def select_all(cls: Type[A]) -> list[A]:
-        data = await abstract_sql(f'SELECT * FROM `{cls.table}`', fetchall=True)
-        return [cls(item) for item in data]
-
-
-class NestedAbstractSQLObject(AbstractSQLObject):
-    def __init__(self, data):
-        super().__init__({})
-        self.original = deepcopy(data)
-        self.original_attrs = set(data.keys())
-        nested = self.nest_dict(data)
-        for k, v in nested.items():
-            setattr(self, k, v)
-
-    def nest_dict(self, flat) -> dict:
-        result = {}
-        for k, v in flat.items():
-            self._nest_dict_rec(k, v, result)
-        return result
-
-    def _nest_dict_rec(self, k, v, out):
-        k, *rest = k.split('_', 1)
-        if rest:
-            self._nest_dict_rec(rest[0], v, out.setdefault(k, {}))
-        else:
-            out[k] = v
 
 
 class AbstractCacheManager:
