@@ -19,7 +19,7 @@ if not bot_token:
     exit()
 
 
-bot = Bot(token=bot_token, parse_mode='MarkdownV2')
+bot = Bot(token=bot_token, parse_mode='HTML')
 dp = Dispatcher()
 dp.include_router(basic.rt)
 
@@ -30,7 +30,7 @@ async def main():
     try:
         bar.update(10)
         bar.refresh()
-        time.sleep(0.5)
+        time.sleep(0.2)
         with open('form.json', 'r', encoding='utf-8') as f:
             temp_data = json.load(f)
 
@@ -45,7 +45,7 @@ async def main():
     finally:
         bar.update(10)
         bar.refresh()
-        time.sleep(0.5)
+        time.sleep(0.2)
 
     if not all(key in temp_data for key in ['слайди', 'фото', 'питання']):
         raise ValueError("Помилка при запуску бота. Відсутні дєякі ключі у файлі конфігу")
@@ -58,7 +58,7 @@ async def main():
 
     bar.update(10)
     bar.refresh()
-    time.sleep(0.5)
+    time.sleep(0.2)
 
     if temp_data['слайди'].keys() != temp_data['фото'].keys():
         return print("Помилка при запуску бота. Не рівна кількість питань і фото")
@@ -95,11 +95,11 @@ async def main():
                 return print("Помилка при запуску бота. Неправильно вказана правильна відповідь")
     bar.update(10)
     bar.refresh()
-    time.sleep(0.5)
+    time.sleep(0.2)
     await bot.delete_webhook(drop_pending_updates=True)
     bar.update(10)
     bar.refresh()
-    time.sleep(0.5)
+    time.sleep(0.2)
     bar.close()
     bot_me = await bot.me()
     print(f"Бот {bot_me.first_name} успішно ввімкнений!")
