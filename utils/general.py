@@ -99,7 +99,7 @@ class AioMember(AbstractSQLObject):
     async def load(cls, user) -> 'AioMember':
         if isinstance(user, User):
             if user.is_bot:
-                await user.bot.send_message(chat_id=user.id, text="Вибачте\, але таке з ботом не провернути")
+                await user.bot.send_message(chat_id=user.id, text="Вибачте, але таке з ботом не провернути")
             user_id = user.id
         else:
             user_id = user

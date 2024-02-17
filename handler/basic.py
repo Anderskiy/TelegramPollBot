@@ -20,12 +20,13 @@ async def start(message: Message):
 
 @rt.callback_query(keyboards.inline.Pagination.filter(F.action.in_(["prev", "next"])))
 async def pagination_handler(call: CallbackQuery, callback_data: keyboards.inline.Pagination):
-    page_num = int(callback_data.page)
-    page = page_num - 1 if page_num >= 0 else 0
+    page_num = callback_data.page + 1 if callback_data.page == 0 else callback_data.page
 
     with suppress(TelegramBadRequest):
         if callback_data.action == "next":
-            page = page_num + 1 if page_num < (len(data['слайди']) - 1) else page_num
+            page = page_num + 1
+        if callback_data.action == "prev":
+            page = page_num - 1
 
         await call.message.delete()
         await call.message.answer_photo(photo=data['фото'][str(page)], caption=data['слайди'][str(page)], reply_markup=keyboards.inline.paginator(page))
@@ -51,7 +52,7 @@ async def poll_answer(quiz_answer: PollAnswer):
     if next_question_id in data["питання"]:
         await send_poll(quiz_answer, next_question_id, chat_id=quiz_answer.user.id)
     else:
-        await quiz_answer.bot.send_message(quiz_answer.user.id, f'Ви набрали {user_scores[quiz_answer.user.id]} {ball(user_scores[quiz_answer.user.id])}\.')
+        await quiz_answer.bot.send_message(quiz_answer.user.id, f'Ви набрали {user_scores[quiz_answer.user.id]} {ball(user_scores[quiz_answer.user.id])}.')
         await AioMember.set_new_result(user_scores[quiz_answer.user.id], quiz_answer.user.id)
         user_scores.clear()
 
@@ -60,13 +61,12 @@ async def poll_answer(quiz_answer: PollAnswer):
 @rt.message()
 async def echo(message: Message):
     if message.from_user.is_bot:
-        return await message.answer("Вибачте\, але таке з ботом не провернути")
+        return
     try:
         await AioMember.load(message.from_user.id)
     except ProfileNotCreatedError:
         await AioMember.create_default(message.from_user.id, message.from_user.username)
     msg = message.text.lower()
-    print(message)
 
     if msg == "що я вмію?":
         await message.answer("Поки що нічого цікавого\\.\\.\\.")
