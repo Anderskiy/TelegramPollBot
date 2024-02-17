@@ -25,7 +25,7 @@ dp.include_router(basic.rt)
 
 
 async def main():
-    bar = tqdm(total=100, desc="Вмикаємо бота...", bar_format=f"{Fore.GREEN}{{l_bar}}{{bar}}{{r_bar}}{Style.RESET_ALL}",
+    bar = tqdm(total=100, desc="Вмикаю бота...", bar_format=f"{Fore.GREEN}{{l_bar}}{{bar}}{{r_bar}}{Style.RESET_ALL}",
                ncols=100, ascii=True)
     try:
         bar.update(10)

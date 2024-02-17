@@ -1,20 +1,19 @@
 from aiogram import F
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandStart
 from aiogram.types import CallbackQuery, PollAnswer
-from aiogram.exceptions import TelegramBadRequest
 
 import keyboards.inline
 from keyboards.reply import main_kb
 from keyboards.inline import paginator
 
 from utils.general import *
-from contextlib import suppress
 
 rt = Router()
 
 @rt.message(CommandStart())
 async def start(message: Message):
-    print(message)
+    print(message.from_user.usernameл, ": /start")
     await message.answer(f"💖 Дякую що скористалися нашим ботом, {message.from_user.first_name}",
                          reply_markup=main_kb)
 
@@ -22,14 +21,16 @@ async def start(message: Message):
 async def pagination_handler(call: CallbackQuery, callback_data: keyboards.inline.Pagination):
     page_num = callback_data.page + 1 if callback_data.page == 0 else callback_data.page
 
-    with suppress(TelegramBadRequest):
-        if callback_data.action == "next":
-            page = page_num + 1
-        if callback_data.action == "prev":
-            page = page_num - 1
+    if callback_data.action == "next":
+        page = page_num + 1
+    if callback_data.action == "prev":
+        page = page_num - 1
 
-        await call.message.delete()
+    await call.message.delete()
+    try:
         await call.message.answer_photo(photo=data['фото'][str(page)], caption=data['слайди'][str(page)], reply_markup=keyboards.inline.paginator(page))
+    except TelegramBadRequest as br:
+        print(f"Сталася помилка при відправленні тексту або файлу: {br.message}")
     await call.answer()
 
 @rt.callback_query(keyboards.inline.Pagination.filter(F.action.in_("close")))
