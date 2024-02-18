@@ -11,6 +11,7 @@
 pyvenv.cfg
 .venv
 pip-selfcheck.json
+config.py
 
 ### JetBrains+all template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
@@ -172,6 +173,7 @@ fabric.properties
 
 ### dotenv template
 .env
+utils/sql_config.py
 
 ### VirtualEnv template
 # Virtualenv
@@ -229,6 +231,8 @@ pip-selfcheck.json
 # .idea/modules
 # *.iml
 # *.ipr
+
+.idea/PollBot.iml
 
 # CMake
 cmake-build-*/

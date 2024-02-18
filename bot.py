@@ -5,21 +5,18 @@ import time
 from tqdm import tqdm
 from colorama import Fore, Style
 
-from dotenv import load_dotenv
-import os
+from config import TOKEN
 
 from aiogram import Bot, Dispatcher
 from handler import basic
 
-load_dotenv()
 
-bot_token = os.getenv('TOKEN')
-if not bot_token:
-    print("Помилка при запуску бота: Не зайдено токену у файлі .env")
+if TOKEN == '':
+    print("Помилка при запуску бота: Не зайдено токену у файлі config.py")
     exit()
 
 
-bot = Bot(token=bot_token, parse_mode='HTML')
+bot = Bot(token=TOKEN, parse_mode='HTML')
 dp = Dispatcher()
 dp.include_router(basic.rt)
 

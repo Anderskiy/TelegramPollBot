@@ -1,0 +1,7 @@
+SQL_CONFIG = {
+    'host': '',
+    'user': '',
+    'password': '',
+    'db': '',
+    'autocommit': True
+}

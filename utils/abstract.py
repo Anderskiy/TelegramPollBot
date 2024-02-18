@@ -8,13 +8,7 @@ from typing import Union, Type, Optional, TypeVar
 import aiomysql
 from pymysql import OperationalError
 
-sql_config = {
-    'host': 'rudy.zzz.com.ua',
-    'user': 'anderskiy',
-    'password': 'SoL_4_5-FlkJk_-0',
-    'db': 'anderskiy',
-    'autocommit': True
-}
+from .sql_config import SQL_CONFIG
 
 async def create_pool():
     global sql_connection_pool
@@ -22,7 +16,7 @@ async def create_pool():
         sql_connection_pool.close()
         await sql_connection_pool.wait_closed()
 
-    sql_connection_pool = await aiomysql.create_pool(0, **sql_config)
+    sql_connection_pool = await aiomysql.create_pool(0, **SQL_CONFIG)
 
 
 asyncio.get_event_loop().run_until_complete(create_pool())
@@ -44,7 +38,6 @@ async def _abstract_sql(query, *params, fetch=False, fetchall=False, last_row=Fa
 async def abstract_sql(*args, **kwargs):
     try:
         return await _abstract_sql(*args, **kwargs)
-    # костыль ебаный
     except (aiomysql.InternalError, BrokenPipeError, OperationalError):
         old_pool = sql_connection_pool
         await create_pool()
@@ -166,7 +159,7 @@ class AbstractCacheManager:
                         stime = ts - time()
                 else:
                     stime = self.cache_lifetime
-            except Exception as e:
+            except Exception:
                 traceback.print_exc()
                 stime = 1
             finally:
