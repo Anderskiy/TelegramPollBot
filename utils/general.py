@@ -16,7 +16,7 @@ sent_polls = {}
 try:
     with open('form.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
-except Exception as e:
+except Exception:
     print("Помилка при запуску бота. Щось у файлі form.json вказано неправильно.")
     exit()
 
@@ -95,10 +95,6 @@ class AioMember(AbstractSQLObject):
             return other == self.id
         return other.id == self.id
 
-    @property
-    def incremental(self) -> list[str]:
-        return ['currency', 'total_messages']
-
     @classmethod
     async def load(cls, user) -> 'AioMember':
         if isinstance(user, User):
@@ -111,7 +107,7 @@ class AioMember(AbstractSQLObject):
             return profiles_cache[user_id]
         res = await cls.select(user_id=user_id)
         if not res:
-            raise ProfileNotCreatedError(f'profile not created yet with id {user_id}')
+            raise ProfileNotCreatedError(f'Ще не було створено профілю для цього користувача {user_id}')
         if user_id in profiles_cache:
             return profiles_cache[user_id]
         profiles_cache[user_id] = res
@@ -119,7 +115,7 @@ class AioMember(AbstractSQLObject):
 
     @classmethod
     async def set_new_result(cls, res, user_id):
-        await abstract_sql('UPDATE users SET result=%s WHERE user_id=%s', f"{res}/{cls.total}", user_id, fetch=True)
+        await abstract_sql('UPDATE users SET result=? WHERE user_id=?', f"{res}/{cls.total}", user_id, fetch=True)
 
 
 loop = asyncio.get_event_loop()

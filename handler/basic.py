@@ -13,7 +13,7 @@ rt = Router()
 
 @rt.message(CommandStart())
 async def start(message: Message):
-    print(message.from_user.usernameл, ": /start")
+    print(message.from_user.username + ": /start")
     await message.answer(f"💖 Дякую що скористалися нашим ботом, {message.from_user.first_name}",
                          reply_markup=main_kb)
 
@@ -68,9 +68,10 @@ async def echo(message: Message):
     except ProfileNotCreatedError:
         await AioMember.create_default(message.from_user.id, message.from_user.username)
     msg = message.text.lower()
+    print(message.from_user.username + ":", message.text)
 
     if msg == "що я вмію?":
-        await message.answer("Поки що нічого цікавого\\.\\.\\.")
+        await message.answer("Поки що нічого цікавого.")
     elif msg == "висадці на місяць 50 років!":
         await message.answer_photo(photo=data['фото']['1'], caption=data['слайди']['1'], reply_markup=paginator())
     elif msg == "пройти вікторину":
