@@ -24,10 +24,6 @@ if not os.path.exists('config.py'):
     print(f"Файл config.py не знайдено.")
     sys.exit(1)
 
-if not os.path.exists('utils/sql_config.py'):
-    print(f"Файл utils/sql_config.py не знайдено.")
-    sys.exit(1)
-
 try:
     subprocess.run([sys.executable, 'bot.py'])
 except FileNotFoundError:
