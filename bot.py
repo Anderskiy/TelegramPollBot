@@ -22,81 +22,53 @@ dp.include_router(basic.rt)
 
 
 async def main():
+    def update_bar(increment: int, t: float = 0):
+        bar.update(increment)
+        bar.refresh()
+        time.sleep(t)
     bar = tqdm(total=100, desc="Вмикаю бота...", bar_format=f"{Fore.GREEN}{{l_bar}}{{bar}}{{r_bar}}{Style.RESET_ALL}",
                ncols=100, ascii=True)
     try:
-        bar.update(10)
-        bar.refresh()
-        time.sleep(0.2)
+        update_bar(10, t=0.2)
         with open('form.json', 'r', encoding='utf-8') as f:
             temp_data = json.load(f)
 
-    except FileNotFoundError:
-        return print("Помилка при запуску бота. Не знайдено файл конфігу: form.json")
-    except json.JSONDecodeError:
-        return print("Помилка при запуску бота. Щось у файлі form.json вказано неправильно.")
-    except ValueError as ve:
-        return print(f"Помилка при запуску бота: {ve}")
+    except FileNotFoundError as e:
+        return print(f"Помилка при запуску бота. {e.strerror}: {e.filename}")
+    except (json.JSONDecodeError, ValueError) as e:
+        return print(f"Помилка при запуску бота. {str(e)}")
     except Exception as e:
         return print(f"При відкритті конфігу була виявлена помилка: {e}")
     finally:
-        bar.update(10)
-        bar.refresh()
-        time.sleep(0.2)
+        update_bar(10, t=0.2)
 
-    if not all(key in temp_data for key in ['слайди', 'фото', 'питання']):
-        raise ValueError("Помилка при запуску бота. Відсутні дєякі ключі у файлі конфігу")
+    required_keys = ['слайди', 'фото', 'питання']
+    if not all(key in temp_data for key in required_keys):
+        raise ValueError("Помилка при запуску бота. Відсутні деякі ключі у файлі конфігу")
 
-    bar.update(10)
-    bar.refresh()
+    update_bar(10)
 
     if len(temp_data['слайди']) != len(set(temp_data['слайди'])):
         return print("Помилка при запуску бота. Є дублікати слайдів.")
 
-    bar.update(10)
-    bar.refresh()
-    time.sleep(0.2)
+    update_bar(10, t=0.2)
+    update_bar(20)
 
-    if temp_data['слайди'].keys() != temp_data['фото'].keys():
-        return print("Помилка при запуску бота. Не рівна кількість питань і фото")
+    for key in ['слайди', 'фото', 'питання']:
+        for idx, item in enumerate(temp_data[key], start=1):
+            if item != str(idx):
+                return print(f"Помилка при запуску бота. Неправильно вказано порядок {key} або їх назву(число у подвійних дужках)")
+            if key == 'питання':
+                for jdx, option in enumerate(temp_data[key][item]['варіанти'], start=1):
+                    if option != str(jdx):
+                        return print("Помилка при запуску бота. Неправильно вказано порядок відповідей або їх назву(число у подвійних дужках)")
+                if str(temp_data['питання'][item]['правильний']) not in temp_data['питання'][item]['варіанти']:
+                    return print("Помилка при запуску бота. Неправильно вказана правильна відповідь")
 
-    bar.update(20)
-    bar.refresh()
-
-    tmp = 0
-    for i in temp_data['слайди']:
-        tmp += 1
-        if i != f"{tmp}":
-            return print("Помилка при запуску бота. Неправильно вказано порядок слайдів або їх назву(число у подвійних дужках)")
-    bar.update(10)
-    bar.refresh()
-    tmp = 0
-    for i in temp_data['фото']:
-        tmp += 1
-        if i != f"{tmp}":
-            return print("Помилка при запуску бота. Неправильно вказано порядок слайдів або їх назву(число у подвійних дужках)")
-    bar.update(10)
-    bar.refresh()
-    tmp = 0
-    for i in temp_data['питання']:
-        tmp += 1
-        if i != f"{tmp}":
-            return print("Помилка при запуску бота. Неправильно вказано порядок запитань або їх назву(число у подвійних дужках)")
-        else:
-            _tmp = 0
-            for j in temp_data['питання'][i]['варіанти']:
-                _tmp += 1
-                if j != f"{_tmp}":
-                    return print("Помилка при запуску бота. Неправильно вказано порядок відповідей або їх назву(число у подвійних дужках)")
-            if str(temp_data['питання'][i]['правильний']) not in temp_data['питання'][i]['варіанти']:
-                return print("Помилка при запуску бота. Неправильно вказана правильна відповідь")
-    bar.update(10)
-    bar.refresh()
-    time.sleep(0.2)
+    update_bar(10, t=0.2)
     await bot.delete_webhook(drop_pending_updates=True)
-    bar.update(10)
-    bar.refresh()
-    time.sleep(0.2)
+    update_bar(10, t=0.2)
+    update_bar(20, t=0.2)
     bar.close()
     bot_me = await bot.me()
     print(f"Бот {bot_me.first_name} успішно ввімкнений!")
