@@ -138,13 +138,13 @@ class AioMember(AbstractSQLObject):
         member_id = await AioMember.get_id_by_username(user)
         if not member_id:
             return None
-        res = await abstract_sql("UPDATE users SET result='0/0' WHERE user_id=?", member_id)
-        return res
+        await abstract_sql("UPDATE users SET result='0/0' WHERE user_id=?", member_id[0])
+        return True
 
     @classmethod
     async def truncate(cls):
         await abstract_sql('DELETE FROM users')
-        await abstract_sql('VACUUM')
+        await abstract_sql('UPDATE sqlite_sequence SET seq = 0')
 
 
 loop = asyncio.get_event_loop()
