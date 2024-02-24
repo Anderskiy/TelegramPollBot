@@ -65,7 +65,7 @@ async def delete_poll_after_timeout(poll_id, timeout, quiz=None):
             await quiz.bot.delete_message(chat_id=quiz.user.id, message_id=sent_poll.message_id)
         del poll_timers[poll_id]
     except Exception as e:
-        print(e)
+        print(f"Помилка | {e}")
 
 
 def ball(user_score):
@@ -88,6 +88,7 @@ class AioMember(AbstractSQLObject):
     _key_column = 'user_id'
     id: int
     username: str
+    result: str
     total = len(data['питання'])
 
     def __eq__(self, other):
@@ -116,6 +117,34 @@ class AioMember(AbstractSQLObject):
     @classmethod
     async def set_new_result(cls, res, user_id):
         await abstract_sql('UPDATE users SET result=? WHERE user_id=?', f"{res}/{cls.total}", user_id, fetch=True)
+
+    @classmethod
+    async def get_all_results(cls):
+        res = await abstract_sql("SELECT username, result FROM users WHERE result != '0/0'", fetchall=True)
+        return res
+
+    @classmethod
+    async def get_result(cls, user_id):
+        res = await abstract_sql("SELECT result FROM users WHERE user_id=? AND result != '0/0'", user_id, fetch=True)
+        return res
+
+    @classmethod
+    async def get_id_by_username(cls, username):
+        res = await abstract_sql("SELECT user_id FROM users WHERE username=?", username[1:], fetch=True)
+        return res
+
+    @classmethod
+    async def clear_one(cls, user):
+        member_id = await AioMember.get_id_by_username(user)
+        if not member_id:
+            return None
+        res = await abstract_sql("UPDATE users SET result='0/0' WHERE user_id=?", member_id)
+        return res
+
+    @classmethod
+    async def truncate(cls):
+        await abstract_sql('DELETE FROM users')
+        await abstract_sql('VACUUM')
 
 
 loop = asyncio.get_event_loop()
