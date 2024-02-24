@@ -15,7 +15,7 @@ async def answer(message: Message):
     answer_text = "\n".join(f"* {member}: {result}" for member, result in answers)
     await message.answer(f"<b>Результати опитування:</b>\n{answer_text}")
 
-@rt.message(IsAdmin(), Command("clear all", "очистити повністю", prefix="!"))
+@rt.message(IsAdmin(), Command("clear all", "очистити все", prefix="!"))
 async def clear_table(message: Message):
     await AioMember.truncate()
     await message.answer("Таблицю було успішно очищено.")

@@ -17,7 +17,7 @@ try:
     with open('form.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
 except Exception:
-    print("Помилка при запуску бота. Щось у файлі form.json вказано неправильно.")
+    print("Помилка | Помилка при запуску бота. Щось у файлі form.json вказано неправильно.")
     exit()
 
 
