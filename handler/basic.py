@@ -15,7 +15,10 @@ rt = Router()
 
 @rt.message(CommandStart())
 async def start(message: Message):
-    print("Чат | " + message.from_user.username + ": /start")
+    try:
+        print("Чат | " + message.from_user.username + ": /start")
+    except TypeError:
+        return await message.answer('На вашому акаунті скриті деякі дані. Без них чат-бот не зможе працювати з вами. Прошу їх ввімкнути')
     await message.answer(
         'Я - чат-бот, який допоможе тобі вивчити тему "Висадка людини на Місяць". \n'
         '\n'
