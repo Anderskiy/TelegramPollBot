@@ -72,7 +72,7 @@ async def poll_answer(quiz_answer: PollAnswer):
         await send_poll(quiz_answer, next_question_id, chat_id=quiz_answer.user.id)
     else:
         await quiz_answer.bot.send_message(quiz_answer.user.id,
-                                           f'Ви набрали {user_scores[quiz_answer.user.id]} {ball(user_scores[quiz_answer.user.id])}.')
+                                           f'Ви набрали {user_scores[quiz_answer.user.id]} з {len(data["питання"])} {ball(len(data["питання"]))}.')
         await AioMember.set_new_result(user_scores[quiz_answer.user.id], quiz_answer.user.id)
         print(
             f"Вікторина | {quiz_answer.user.username}: {user_scores[quiz_answer.user.id]}/{len(data['питання'])} {ball(user_scores[quiz_answer.user.id])}")
@@ -95,7 +95,7 @@ async def echo(message: Message):
 
     if msg == "що я вмію?":
         await message.answer("Поки що нічого цікавого.")
-    elif msg == "висадці на місяць 50 років!":
+    elif msg == "переглянути презентацію":
         await message.answer_photo(photo=data['фото']['1'], caption=data['слайди']['1'], reply_markup=paginator())
     elif msg == "пройти вікторину":
         tmp = await AioMember.get_result(message.from_user.id)

@@ -72,15 +72,9 @@ def ball(user_score):
     if user_score < 1:
         return "балів"
     if user_score == 1:
-        return "бал"
-    elif user_score >= 25:
-        return "балів"
-    elif user_score >= 22:
-        return "бала"
-    elif user_score >= 5:
-        return "балів"
+        return "балу"
     elif user_score >= 2:
-        return "бала"
+        return "балів"
 
 
 class AioMember(AbstractSQLObject):
