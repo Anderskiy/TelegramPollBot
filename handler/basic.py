@@ -16,8 +16,17 @@ rt = Router()
 @rt.message(CommandStart())
 async def start(message: Message):
     print("Чат | " + message.from_user.username + ": /start")
-    await message.answer(f"💖 Дякую що скористалися нашим ботом, {message.from_user.first_name}",
-                         reply_markup=main_kb)
+    await message.answer(
+        'Я - чат-бот, який допоможе тобі вивчити тему "Висадка людини на Місяць". \n'
+        '\n'
+        'Зі мною ти зможеш: \n'
+        '<i>◦ Пройти через інтерактивні презентації, які описують ключові моменти висадки людини на Місяць.</i> \n'
+        '<i>◦ Перевірити свої знання за допомогою тестів.</i> \n'
+        '<i>◦ Отримати оцінку за результатами тесту.</i> \n'
+        '<i>◦ Повторити матеріал скільки завгодно разів.</i> \n'
+        '\n'
+        'Готовий дізнатися про подію більше? Тож, мершій!',
+        reply_markup=main_kb)
 
 
 @rt.callback_query(keyboards.inline.Pagination.filter(F.action.in_(["prev", "next"])))
@@ -62,7 +71,8 @@ async def poll_answer(quiz_answer: PollAnswer):
         await quiz_answer.bot.send_message(quiz_answer.user.id,
                                            f'Ви набрали {user_scores[quiz_answer.user.id]} {ball(user_scores[quiz_answer.user.id])}.')
         await AioMember.set_new_result(user_scores[quiz_answer.user.id], quiz_answer.user.id)
-        print(f"Вікторина | {quiz_answer.user.username}: {user_scores[quiz_answer.user.id]}/{len(data['питання'])} {ball(user_scores[quiz_answer.user.id])}")
+        print(
+            f"Вікторина | {quiz_answer.user.username}: {user_scores[quiz_answer.user.id]}/{len(data['питання'])} {ball(user_scores[quiz_answer.user.id])}")
         user_scores.clear()
 
     poll_timers[quiz_answer.poll_id] = asyncio.create_task(
